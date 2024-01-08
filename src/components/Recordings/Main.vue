@@ -7,7 +7,7 @@
   
     <div class="main-header">
       <div class="main-title">
-        <h5>My Recordings <span>19</span></h5>
+        <h5>My Recordings <span>{{ recordedCount }}</span></h5>
       </div>
       <div class="main-items">
         <button class="adilo-btn adilo-btn-white"><i class="fa fa-unsorted"></i>&nbsp;By Date</button>
@@ -71,7 +71,7 @@
       <!-- ./New Recording -->
 
     <!-- Empty Recorded -->
-    <div class="empty-recorded-card">
+    <div v-if="recordedCount == 0" class="empty-recorded-card">
       <div class="empty-card-body">
         <img :src="emptyRecordSrc" alt="Empty Recording Picture">
         <p>Say hello to the world!</p>
@@ -84,36 +84,58 @@
     </div>
       <!-- ./Empty Recorded -->
 
-    <div class="app-container">
-      <h1>Media Recorder</h1>
-
-      <div class="action-buttons">
-        <button @click="mediaStartRecording('video')">Start Video Recording</button>
-        <button @click="stopRecording('video')">Stop Video Recording</button>
-      </div>
-
-      <div class="action-buttons">
-        <button @click="mediaStartRecording('audio')">Start Audio Recording</button>
-        <button @click="stopRecording('audio')">Stop Audio Recording</button>
-      </div>
-
-      <div class="action-buttons">
-        <button @click="startScreenRecording">Start Screen Recording</button>
-        <button @click="stopScreenRecording">Stop Screen Recording</button>
-      </div>
-
-      <div class="media-player">
-        <video ref="videoPlayer" controls></video>
-        <audio ref="audioPlayer" controls></audio>
-        <video ref="screenPlayer" controls></video>
+    <!-- Recent Recordings -->
+    <div v-if="recordedCount > 0" class="recent-recordings-card">
+      <div class="recent-records-table">
+       <table class="table table-borderless">
+        <thead>
+          <tr>
+            <th>Recordings</th>
+            <th>Title</th>
+            <th>Views</th>
+            <th>Size</th>
+            <th>Last Modified</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in recordings" :key="index">
+            <td>
+              <img :src="recordingImgSampleSrc" alt="" class="recording-img-frame">
+            </td>
+            <td>
+              <p>{{ item.title }}</p>
+              <small>{{ item.description }}</small>
+            </td>
+            <td>{{ item.views }}</td>
+            <td>{{ item.size }}</td>
+            <td>{{ item.lastModified }}</td>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-ellipsis-h"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item text-danger" @click="removeRecording(index)" href="#">Remove</a></li>
+                  <li><a class="dropdown-item" href="#">Options</a></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+       </table>
       </div>
     </div>
+      <!-- ./Recent Recordings -->
+
+    
     
   </div>
 </template>
 
 <script>
 import EmptyRecordingImage from "@/assets/empty-recording.png";
+import RecordingImageSample from "@/assets/recordings/recording5.png";
 
 export default {
   name: "Main",
@@ -121,6 +143,10 @@ export default {
   data() {
     return {
       emptyRecordSrc: EmptyRecordingImage,
+      recordingImgSampleSrc: RecordingImageSample,
+      recordedCount: 0,
+      recordings: [],
+
       videoStream: null,
       audioStream: null,
       screenStream: null,
@@ -132,85 +158,63 @@ export default {
   methods: {
 
     newRecordingModal() {
-      // Use Bootstrap's modal method to show the modal
       $(this.$refs.myModal).modal('show');
     },
+
     startRecording() {
-      // Add logic to save changes if needed
-      // For example, emit an event to notify the parent component
-      this.$emit('save-changes');
+
+      /** Media Streaming */
+
+      
+      
+      // Create a new recording object
+      const newRecording = {
+        imageSrc: '',
+        title: 'Getting it right the first time',
+        description: 'Video desc will be displayed here',
+        views: 245,
+        size: '982 KB',
+        lastModified: '2 weeks ago',
+      };
+
+      const existingRecordings = JSON.parse(localStorage.getItem('recordings')) || [];
+
+      existingRecordings.push(newRecording);
+      
+      localStorage.setItem('recordings', JSON.stringify(existingRecordings));
+
+      this.recordings = existingRecordings;
+      
+      this.recordedCount = this.recordings.length;
+
+      console.log(this.recordedCount);
       
       // Close the modal after saving changes
       $(this.$refs.myModal).modal('hide');
     },
 
-    handleSaveChanges() {
-      // Handle the save changes logic here
-      console.log('Changes saved!');
-    },
-    
-    
-    async mediaStartRecording(type) {
-      const stream = await navigator.mediaDevices.getUserMedia({ [type]: true });
+    // Remove recorded from localStorage
+    removeRecording(index) {
 
-      if (type === 'video') {
-        this.videoStream = stream;
-        this.videoRecorder = new MediaRecorder(stream);
-        this.videoRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            const videoBlob = new Blob([event.data], { type: 'video/webm' });
-            this.$refs.videoPlayer.src = URL.createObjectURL(videoBlob);
-          }
-        };
-        this.videoRecorder.start();
-      } else if (type === 'audio') {
-        this.audioStream = stream;
-        this.audioRecorder = new MediaRecorder(stream);
-        this.audioRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            const audioBlob = new Blob([event.data], { type: 'audio/wav' });
-            this.$refs.audioPlayer.src = URL.createObjectURL(audioBlob);
-          }
-        };
-        this.audioRecorder.start();
-      }
-    },
-    stopRecording(type) {
-      if (type === 'video') {
-        this.videoRecorder.stop();
-        this.videoStream.getTracks().forEach((track) => track.stop());
-      } else if (type === 'audio') {
-        this.audioRecorder.stop();
-        this.audioStream.getTracks().forEach((track) => track.stop());
-      }
-    },
-    async startScreenRecording() {
-      try {
-        this.screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-        this.screenRecorder = new MediaRecorder(this.screenStream);
-        this.screenRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            const screenBlob = new Blob([event.data], { type: 'video/webm' });
-            this.$refs.screenPlayer.src = URL.createObjectURL(screenBlob);
-          }
-        };
-        this.screenRecorder.start();
-      } catch (error) {
-        console.error('Error starting screen recording:', error);
-      }
-    },
-    stopScreenRecording() {
-      if (this.screenRecorder) {
-        this.screenRecorder.stop();
-        this.screenStream.getTracks().forEach((track) => track.stop());
-      }
+      this.recordings.splice(index, 1);
+
+      localStorage.setItem('recordings', JSON.stringify(this.recordings));
+
+      this.recordedCount = this.recordings.length;
     },
   },
-  
+
+  mounted() {
+    // Retrieve data from localStorage
+    const storedRecordings = JSON.parse(localStorage.getItem('recordings')) || [];
+    this.recordings = storedRecordings;
+
+    // Initialize recordedCount based on the initial state of recordings
+    this.recordedCount = storedRecordings.length;
+  },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 
 // Variables
@@ -277,9 +281,7 @@ export default {
       }
     }
     .main-items {
-
       .adilo-button-styles();
-
     }    
   }
 
@@ -350,6 +352,44 @@ export default {
       }
     }
   }
+
+  // Recent Recordings
+  .recent-recordings-card {
+    margin-top: 30px;
+
+    .recent-records-table {
+      // border: 1px solid red;
+      text-align: left;
+
+      thead {
+        tr > th {
+          padding-bottom: 20px;
+        }
+      }
+
+      tbody {
+        tr {
+          td:nth-child(1) {
+            width: 100px;
+          }
+
+          td {
+            padding-bottom: 20px;
+            .recording-img-frame {
+              height: 70px;
+              width: 110px;
+              border-radius: 7px;
+              border: 1px solid grey;
+            }
+            .fa-ellipsis-h {
+              font-size: 22px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
 }
 
 /* Toggle Switch styles */
@@ -413,42 +453,6 @@ input[type="checkbox"] {
   #content {
     padding-left: 5rem;
     padding-right: 1rem;
-  }
-}
-
-
-// Media Styles:
-.app-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-h1 {
-  text-align: center;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-button {
-  padding: 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.media-player {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  video,
-  audio {
-    margin-top: 15px;
-    max-width: 400px;
   }
 }
 
