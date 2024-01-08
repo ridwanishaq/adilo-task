@@ -23,31 +23,3 @@ export default createStore({
     },
   },
 });
-
-
-// export default createStore({
-//   state: {},
-//   getters: {},
-//   mutations: {},
-//   actions: {},
-  
-
-//   state: {
-//     preferredSettings: null,
-//   },
-//   getters: {
-//     getPreferredSettings: (state) => state.preferredSettings,
-//   },
-//   mutations: {
-//     setPreferredSettings(state, settings) {
-//       state.preferredSettings = settings;
-//     },
-//   },
-//   actions: {
-//     updatePreferredSettings({ commit }, settings) {
-//       commit('setPreferredSettings', settings);
-//     },
-//   },
-  
-//   modules: {},
-// });
