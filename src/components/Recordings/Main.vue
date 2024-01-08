@@ -39,21 +39,21 @@
                 <div class="record-config">
                   <p>Record Screen</p>
                   <div class="">
-                    <input type="checkbox" id="toggleSwitch1" checked>
+                    <input type="checkbox" id="toggleSwitch1" v-model="recordScreen">
                     <label for="toggleSwitch1" class="switch"></label>
                   </div>
                 </div>
                 <div class="record-config">
                   <p>Record Camera</p>
                   <div class="">
-                    <input type="checkbox" id="toggleSwitch2" checked>
+                    <input type="checkbox" id="toggleSwitch2" v-model="recordCamera">
                     <label for="toggleSwitch2" class="switch"></label>
                   </div>
                 </div>
                 <div class="record-config">
                   <p>Record Mic</p>
                   <div class="">
-                    <input type="checkbox" id="toggleSwitch3">
+                    <input type="checkbox" id="toggleSwitch3" v-model="recordMic">
                     <label for="toggleSwitch3" class="switch"></label>
                   </div>
                 </div>
@@ -132,6 +132,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import EmptyRecordingImage from "@/assets/empty-recording.png";
 import RecordingImageSample from "@/assets/recordings/recording5.png";
 
@@ -145,12 +146,9 @@ export default {
       recordedCount: 0,
       recordings: [],
 
-      videoStream: null,
-      audioStream: null,
-      screenStream: null,
-      videoRecorder: null,
-      audioRecorder: null,
-      screenRecorder: null,
+      recordCamera: true,
+      recordMic: false,
+      recordScreen: true,
     };
   },
   methods: {
@@ -158,35 +156,46 @@ export default {
     newRecordingModal() {
       $(this.$refs.myModal).modal('show');
     },
-
+    ...mapActions(['updatePreferredSettings']),
     startRecording() {
 
-      /** Media Streaming */
-      this.$router.push({name:'livepreview'});
-      
-      // Create a new recording object
-      // const newRecording = {
-      //   imageSrc: '',
-      //   title: 'Getting it right the first time',
-      //   description: 'Video desc will be displayed here',
-      //   views: 245,
-      //   size: '982 KB',
-      //   lastModified: '2 weeks ago',
-      // };
+      // Validate Options
+      if (!this.recordScreen && !this.recordCamera && !this.recordMic) {
+        alert('Please select at least one option.');
+      } else {
+        
+        const preferredSettings = { 
+          rCamera: this.recordCamera,
+          rMic: this.recordMic,
+          rScreen: this.recordScreen,
+        };
+        this.updatePreferredSettings(preferredSettings);
+        
+        // Create a new recording object
+        const newRecording = {
+          imageSrc: '',
+          title: 'Getting it right the first time',
+          description: 'Video desc will be displayed here',
+          views: 245,
+          size: '982 KB',
+          lastModified: '2 weeks ago',
+        };
 
-      // const existingRecordings = JSON.parse(localStorage.getItem('recordings')) || [];
+        const existingRecordings = JSON.parse(localStorage.getItem('recordings')) || [];
 
-      // existingRecordings.push(newRecording);
-      
-      // localStorage.setItem('recordings', JSON.stringify(existingRecordings));
+        existingRecordings.push(newRecording);
+        
+        localStorage.setItem('recordings', JSON.stringify(existingRecordings));
 
-      // this.recordings = existingRecordings;
-      
-      // this.recordedCount = this.recordings.length;
+        this.recordings = existingRecordings;
+        
+        this.recordedCount = this.recordings.length;
 
-      // console.log(this.recordedCount);
-      
-      $(this.$refs.myModal).modal('hide');
+        $(this.$refs.myModal).modal('hide');
+        
+        // move to live-preview
+        this.$router.push({name:'livepreview'});
+      }
     },
 
     // Remove recorded from localStorage
