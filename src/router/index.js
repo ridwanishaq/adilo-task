@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import RecordingView from "../views/RecordingView.vue";
 import RequestedView from "../views/RequestedView.vue";
+import LivePreviewView from "../views/LivePreviewView.vue";
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
     path: "/requested",
     name: "requested",
     component: RequestedView,
+  },
+  {
+    path: "/live-preview",
+    name: "livepreview",
+    component: LivePreviewView,
   },
   {
     path: "/about",

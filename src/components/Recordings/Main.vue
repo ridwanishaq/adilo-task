@@ -127,9 +127,7 @@
       </div>
     </div>
       <!-- ./Recent Recordings -->
-
-    
-    
+  
   </div>
 </template>
 
@@ -164,32 +162,30 @@ export default {
     startRecording() {
 
       /** Media Streaming */
-
-      
+      this.$router.push({name:'livepreview'});
       
       // Create a new recording object
-      const newRecording = {
-        imageSrc: '',
-        title: 'Getting it right the first time',
-        description: 'Video desc will be displayed here',
-        views: 245,
-        size: '982 KB',
-        lastModified: '2 weeks ago',
-      };
+      // const newRecording = {
+      //   imageSrc: '',
+      //   title: 'Getting it right the first time',
+      //   description: 'Video desc will be displayed here',
+      //   views: 245,
+      //   size: '982 KB',
+      //   lastModified: '2 weeks ago',
+      // };
 
-      const existingRecordings = JSON.parse(localStorage.getItem('recordings')) || [];
+      // const existingRecordings = JSON.parse(localStorage.getItem('recordings')) || [];
 
-      existingRecordings.push(newRecording);
+      // existingRecordings.push(newRecording);
       
-      localStorage.setItem('recordings', JSON.stringify(existingRecordings));
+      // localStorage.setItem('recordings', JSON.stringify(existingRecordings));
 
-      this.recordings = existingRecordings;
+      // this.recordings = existingRecordings;
       
-      this.recordedCount = this.recordings.length;
+      // this.recordedCount = this.recordings.length;
 
-      console.log(this.recordedCount);
+      // console.log(this.recordedCount);
       
-      // Close the modal after saving changes
       $(this.$refs.myModal).modal('hide');
     },
 

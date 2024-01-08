@@ -4,7 +4,7 @@
     <div class="container-fluid">
 
       <div class="logo-bar">
-        <img :src="adiloLogoSrc" alt="Adilo Logo">
+        <router-link to="/"><img :src="adiloLogoSrc" alt="Adilo Logo"></router-link>
       </div>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
