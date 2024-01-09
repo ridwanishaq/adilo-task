@@ -77,8 +77,17 @@
         <p>Say hello to the world!</p>
         <small>Record your first video/audio and share it with your team, friends,<br> followers and customers.</small>
         <div class="start-record-btn-card">
-        <button class="adilo-btn adilo-btn-red" @click="newRecordingModal"><i class="fa fa-play-circle"></i>&nbsp;Start Recording</button>
+          <button class="adilo-btn adilo-btn-red" @click="newRecordingModal"><i class="fa fa-play-circle"></i>&nbsp;Start Recording</button>
           <button class="adilo-btn adilo-btn-blue"><i class="fa fa-video"></i>&nbsp;New Request</button>
+        </div>
+      </div>
+      <div class="desktop-recorder">
+        <div class="preview-card">
+          <img :src="previewImageSrc" alt="Preview Image">
+        </div>
+        <div class="download-card">
+          <h4>Want more controls & better <br> quality recording?</h4>
+          <button class="adilo-btn adilo-btn-blue">Download the desktop recorder</button>
         </div>
       </div>
     </div>
@@ -134,6 +143,7 @@
 <script>
 import { mapActions } from 'vuex';
 import EmptyRecordingImage from "@/assets/empty-recording.png";
+import PreviewDownloadImage from "@/assets/preview-img.png";
 import RecordingImageSample from "@/assets/recordings/recording5.png";
 
 export default {
@@ -143,6 +153,7 @@ export default {
     return {
       emptyRecordSrc: EmptyRecordingImage,
       recordingImgSampleSrc: RecordingImageSample,
+      previewImageSrc: PreviewDownloadImage,
       recordedCount: 0,
       recordings: [],
 
@@ -259,143 +270,51 @@ export default {
   }
 }
 
+/** Toggle Reuse styles */
+.toggle-switch-styles {
+  .switch {
+    display: inline-block;
+    width: @switch-width;
+    height: @switch-height;
+    background-color: @switch-bg-color-off; /* Default color for unchecked state */
+    border-radius: @switch-border-radius;
+    cursor: pointer;
+    position: relative;
+    padding-top: 2px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: calc(@switch-height - @switch-padding * 2);
+      height: calc(@switch-height - @switch-padding * 2);
+      background-color: @switch-thumb-color;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+      transform: translateX(@switch-padding);
+    }
+  }
+}
+.toggle-switch-button-styles {
+  input[type="checkbox"] {
+    display: none;
+
+    &:checked + .switch {
+      background-color: @switch-bg-color-on;
+    }
+
+    &:checked + .switch::before {
+      transform: translateX(calc(@switch-width - @switch-height + @switch-padding));
+    }
+  }
+}
+
+
 .label-text {
   font-size: @base-font-size;
   color: @base-color;
 }
 
-#content {
-  width: 100%;
-  transition: all 0.3s;
-  border-radius: 5px;
-  padding: 1rem;
-  box-sizing: border-box;
 
-  .main-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-
-    .main-title {
-      margin: 0;
-      text-align: left;
-
-      span {
-        margin-left:15px;
-        font-weight: bold;
-      }
-    }
-    .main-items {
-      .adilo-button-styles();
-    }    
-  }
-
-  // Modal:
-  .recording-modal-box {
-    text-align: left;
-    .modal-header {
-      padding: 15px 35px;
-
-      h5{
-        font-weight: bold;
-      }
-    }
-    .modal-body {
-      padding: 20px 35px;
-    }
-
-    .recording-settings {
-      margin-top:35px;
-      .record-config {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 15px;
-
-        p {
-          font-weight: bold;
-        }
-
-      }
-    }
-
-    .record-btn {
-      margin-top: 35px;
-      margin-bottom: 15px;
-      text-align:center;
-
-      button {
-        width: 250px;
-        border-radius: 30px;
-      }
-    }
-  }
-  
-  // Empty Recorded Card
-  .empty-recorded-card {
-    margin-top: 30px;
-    
-    .empty-card-body {
-      width: 100%; 
-      height: 60vh; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      text-align: center; 
-      color: #bbb; 
-      border: 2px dashed #ccc;
-      border-radius: 30px;
-
-      p {
-        font-weight: bold;
-        color: #000;
-      }
-
-      .start-record-btn-card {
-        margin-top: 20px;
-        .adilo-button-styles();
-      }
-    }
-  }
-
-  // Recent Recordings
-  .recent-recordings-card {
-    margin-top: 30px;
-
-    .recent-records-table {
-      // border: 1px solid red;
-      text-align: left;
-
-      thead {
-        tr > th {
-          padding-bottom: 20px;
-        }
-      }
-
-      tbody {
-        tr {
-          td:nth-child(1) {
-            width: 100px;
-          }
-
-          td {
-            padding-bottom: 20px;
-            .recording-img-frame {
-              height: 70px;
-              width: 110px;
-              border-radius: 7px;
-              border: 1px solid grey;
-            }
-            .fa-ellipsis-h {
-              font-size: 22px;
-            }
-          }
-        }
-      }
-    }
-  }
-  
-}
 
 /* Toggle Switch styles */
 .switch {
@@ -437,6 +356,94 @@ input[type="checkbox"] {
   #content {
     padding-left: 2rem;
     padding-right: 1rem;
+
+    .main-header {
+      width: 100%;
+      // border:2px solid red;
+      display: grid;
+      justify-content: space-between;
+      .main-items {
+        button {
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+        .adilo-button-styles(); 
+      }  
+    }
+
+    // Empty Recorded Card
+    .empty-recorded-card {
+      margin-top: 30px;
+      
+      .empty-card-body {
+        width: 100%; 
+        height: 60vh; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+        text-align: center; 
+        color: #bbb; 
+        border: 2px dashed #ccc;
+        border-radius: 30px;
+
+        p {
+          font-weight: bold;
+          color: #000;
+        }
+
+        .start-record-btn-card {
+          margin-top: 20px;
+          .adilo-button-styles();
+        }
+      }
+
+      .desktop-recorder {
+        margin-top: 35px;
+        margin-bottom: 55px;
+        height: 40vh;
+        display: flex;
+        justify-content: space-between;
+
+        .preview-card {
+          width: 50%;
+          
+          
+          img {
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+          }
+        }
+
+        .download-card {
+          padding-left:50px;
+          width: 50%;
+          display: flex; 
+          flex-direction: column; 
+          align-items: left; 
+          justify-content: center; 
+          text-align: left; 
+          
+          button {
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 30px;
+            padding: 7px 20px;
+            width: 60%;
+            background-color: #0DABD8;
+            color: #fff;
+          }
+
+          h4 {
+            font-weight: bold;
+          }
+
+        }
+
+      }
+    }
+
   }
 }
 
@@ -445,6 +452,7 @@ input[type="checkbox"] {
     padding-left: 3rem;
     padding-right: 1rem;
   }
+
 }
 
 @media (min-width: 992px) {
@@ -456,8 +464,137 @@ input[type="checkbox"] {
 
 @media (min-width: 1200px) {
   #content {
+    width: 100%;
+    transition: all 0.3s;
+    border-radius: 5px;
     padding-left: 5rem;
     padding-right: 1rem;
+    box-sizing: border-box;
+
+    .main-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      .main-title {
+        margin: 0;
+        text-align: left;
+
+        span {
+          margin-left:15px;
+          font-weight: bold;
+        }
+      }
+      .main-items {
+        .adilo-button-styles();
+      }    
+    }
+
+    // Modal:
+    .recording-modal-box {
+      text-align: left;
+      .modal-header {
+        padding: 15px 35px;
+
+        h5{
+          font-weight: bold;
+        }
+      }
+      .modal-body {
+        padding: 20px 35px;
+      }
+
+      .recording-settings {
+        margin-top:35px;
+        .record-config {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 15px;
+
+          p {
+            font-weight: bold;
+          }
+
+        }
+      }
+
+      .record-btn {
+        margin-top: 35px;
+        margin-bottom: 15px;
+        text-align:center;
+
+        button {
+          width: 250px;
+          border-radius: 30px;
+        }
+      }
+    }
+    
+    // Empty Recorded Card
+    .empty-recorded-card {
+      margin-top: 30px;
+      
+      .empty-card-body {
+        width: 100%; 
+        height: 60vh; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+        text-align: center; 
+        color: #bbb; 
+        border: 2px dashed #ccc;
+        border-radius: 30px;
+
+        p {
+          font-weight: bold;
+          color: #000;
+        }
+
+        .start-record-btn-card {
+          margin-top: 20px;
+          .adilo-button-styles();
+        }
+      }
+    }
+
+    // Recent Recordings
+    .recent-recordings-card {
+      margin-top: 30px;
+
+      .recent-records-table {
+        // border: 1px solid red;
+        text-align: left;
+
+        thead {
+          tr > th {
+            padding-bottom: 20px;
+          }
+        }
+
+        tbody {
+          tr {
+            td:nth-child(1) {
+              width: 100px;
+            }
+
+            td {
+              padding-bottom: 20px;
+              .recording-img-frame {
+                height: 70px;
+                width: 110px;
+                border-radius: 7px;
+                border: 1px solid grey;
+              }
+              .fa-ellipsis-h {
+                font-size: 22px;
+              }
+            }
+          }
+        }
+      }
+    }
+    
   }
 }
 
